@@ -6,9 +6,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -75,7 +75,7 @@ public class WebJarAssetLocator {
                 while (enumeration.hasMoreElements()) {
                     urls.add(enumeration.nextElement());
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -95,7 +95,7 @@ public class WebJarAssetLocator {
                 final File file;
                 try {
                     file = new File(url.toURI());
-                } catch (URISyntaxException e) {
+                } catch (final URISyntaxException e) {
                     throw new RuntimeException(e);
                 }
                 final Set<String> paths = listFiles(file, filterExpr);
@@ -104,7 +104,7 @@ public class WebJarAssetLocator {
                 final JarFile file;
                 try {
                     file = new JarFile(url.getPath().substring(5, url.getPath().indexOf("!")));
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     throw new RuntimeException(e);
                 }
                 final Enumeration<JarEntry> entries = file.entries();
@@ -151,7 +151,7 @@ public class WebJarAssetLocator {
     /*
      * Make paths like aa/bb/cc = cc/bb/aa.
      */
-    private static String reversePath(String assetPath) {
+    private static String reversePath(final String assetPath) {
         final String[] assetPathComponents = assetPath.split("/");
         final StringBuilder reversedAssetPath = new StringBuilder();
         for (int i = assetPathComponents.length - 1; i >= 0; --i) {
@@ -171,7 +171,7 @@ public class WebJarAssetLocator {
      */
     public WebJarAssetLocator() {
         this(getFullPathIndex(Pattern.compile(".*"),
-                WebJarAssetLocator.class.getClassLoader()));
+                Thread.currentThread().getContextClassLoader()));
     }
 
     /**
