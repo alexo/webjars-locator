@@ -20,16 +20,10 @@ import java.util.regex.Pattern;
  * Locate WebJar assets. The class is thread safe.
  */
 public class WebJarAssetLocator {
-
-    /**
-     * The webjar package name.
-     */
-    public static final String WEBJARS_PACKAGE = "META-INF.resources.webjars";
-
     /**
      * The path to where webjar resources live.
      */
-    public static final String WEBJARS_PATH_PREFIX = "META-INF/resources/webjars";
+    private static final String WEBJARS_PATH_PREFIX = "META-INF/resources/webjars";
 
     private static final int MAX_DIRECTORY_DEPTH = 5;
 
@@ -135,7 +129,7 @@ public class WebJarAssetLocator {
      *                     from.
      * @return the index.
      */
-    public static SortedMap<String, String> getFullPathIndex(
+    private static SortedMap<String, String> getFullPathIndex(
             final Pattern filterExpr, final ClassLoader... classLoaders) {
 
         final Set<String> assetPaths = getAssetPaths(filterExpr, classLoaders);
@@ -163,7 +157,22 @@ public class WebJarAssetLocator {
         return reversedAssetPath.toString();
     }
 
-    final SortedMap<String, String> fullPathIndex;
+  /**
+   * A factory method for creating a {@link WebJarAssetLocator} instance using the provided {@link ClassLoader}.
+   *
+   * @param classLoader
+   *          to use for searching webjar assets.
+   * @return an instance of {@link WebJarAssetLocator}.
+   */
+    public static WebJarAssetLocator create(final ClassLoader classLoader) {
+      if (classLoader == null) {
+        throw new IllegalArgumentException("classLoader cannot be null");
+      }
+      return new WebJarAssetLocator(getFullPathIndex(Pattern.compile(".*"),
+                classLoader));
+    }
+
+    private final SortedMap<String, String> fullPathIndex;
 
     /**
      * Convenience constructor that will form a locator for all resources on the
@@ -179,7 +188,7 @@ public class WebJarAssetLocator {
      *
      * @param fullPathIndex the index to use.
      */
-    public WebJarAssetLocator(final SortedMap<String, String> fullPathIndex) {
+    private WebJarAssetLocator(final SortedMap<String, String> fullPathIndex) {
         this.fullPathIndex = fullPathIndex;
     }
 
@@ -226,10 +235,6 @@ public class WebJarAssetLocator {
         }
 
         return fullPath;
-    }
-
-    public SortedMap<String, String> getFullPathIndex() {
-        return fullPathIndex;
     }
 
     /**
